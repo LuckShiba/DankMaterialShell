@@ -24,11 +24,6 @@
             dgop = dgop.packages.${pkgs.stdenv.hostPlatform.system}.dgop;
             dankMaterialShell = self.packages.${pkgs.stdenv.hostPlatform.system}.dankMaterialShell;
         };
-        mkModuleWithDmsPkgs = path: args @ {pkgs, ...}: {
-            imports = [
-                (import path (args // {dmsPkgs = buildDmsPkgs pkgs;}))
-            ];
-        };
     in {
         formatter = forEachSystem (_: pkgs: pkgs.alejandra);
 
@@ -52,7 +47,7 @@
 
                     pname = "dmsCli";
                     src = ./core;
-                    vendorHash = "sha256-nc4CvEPfJ6l16/zmhnXr1jqpi6BeSXd3g/51djbEfpQ=";
+                    vendorHash = "sha256-XbCg6qQwD4g4R/hBReLGE4NOq9uv0LBqogmfpBs//Ic=";
 
                     subPackages = ["cmd/dms"];
 
@@ -86,12 +81,20 @@
             }
         );
 
-        homeModules.dankMaterialShell.default = mkModuleWithDmsPkgs ./distro/nix/home.nix;
+        homeModules.dankMaterialShell.default = {pkgs, ...}: let
+            dmsPkgs = buildDmsPkgs pkgs;
+        in {
+            imports = [./nix/default.nix];
+            _module.args.dmsPkgs = dmsPkgs;
+        };
 
-        homeModules.dankMaterialShell.niri = import ./distro/nix/niri.nix;
+        homeModules.dankMaterialShell.niri = import ./nix/niri.nix;
 
-        nixosModules.dankMaterialShell = mkModuleWithDmsPkgs ./distro/nix/nixos.nix;
-
-        nixosModules.greeter = mkModuleWithDmsPkgs ./distro/nix/greeter.nix;
+        nixosModules.greeter = {pkgs, ...}: let
+            dmsPkgs = buildDmsPkgs pkgs;
+        in {
+            imports = [./nix/greeter.nix];
+            _module.args.dmsPkgs = dmsPkgs;
+        };
     };
 }
