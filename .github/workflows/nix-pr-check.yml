@@ -9,6 +9,7 @@ on:
   push:
     branches: [master, main, nix-tests-tests]
     paths:
+      - ".github/workflows/nix-pr-check.yml"
       - "flake.*"
       - "distro/nix/**"
 jobs:
