@@ -12,6 +12,10 @@ let
     + "/nixos";
 
   niriFlake = builtins.getFlake "github:sodiboo/niri-flake/2bb22af2985e5f3cfd051b3d977ebfbf81126280?narHash=sha256-ooPmu%2B8tqOGh4kozPW4rJC7Y7WM/FHtEY3OK1PoNW7g%3D";
+
+  fakeNiri = (pkgs.writeScriptBin "niri" "") // {
+    cargoBuildNoDefaultFeatures = false;
+  };
 in
 pkgs.testers.runNixOSTest {
   name = "dms-niri-home-module";
@@ -51,7 +55,10 @@ pkgs.testers.runNixOSTest {
       home.homeDirectory = "/home/danklinux";
       home.stateVersion = "25.11";
 
-      programs.niri.enable = true;
+      programs.niri = {
+        enable = true;
+        package = fakeNiri; # avoids niri from being compiled in the CI
+      };
 
       programs.dank-material-shell = {
         enable = true;
