@@ -6,6 +6,11 @@ on:
     paths:
       - "flake.*"
       - "distro/nix/**"
+  push:
+    branches: [master, main, nix-tests-tests]
+    paths:
+      - "flake.*"
+      - "distro/nix/**"
 jobs:
   check-flake:
     runs-on: ubuntu-latest
